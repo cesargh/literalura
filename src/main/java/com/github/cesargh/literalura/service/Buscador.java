@@ -1,0 +1,53 @@
+package com.github.cesargh.literalura.service;
+
+import com.github.cesargh.literalura.model.DatoBiblioteca;
+import com.github.cesargh.literalura.model.DatoLibro;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.security.InvalidParameterException;
+import java.util.*;
+
+public final class Buscador {
+
+    private Buscador() {
+    }
+
+    private static String RequerirJSON(String targetURL)
+            throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(targetURL)).build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.body();
+    }
+
+    public static Optional<List<DatoLibro>> BuscarLibrosPorTitulo(String titulo)
+            throws InvalidParameterException, IOException, InterruptedException {
+        if ((titulo == null) || titulo.isBlank()) {
+            throw new InvalidParameterException("Buscador.BuscarLibrosPorTitulo --> Omisión de parámetro");
+        } else{
+            List<DatoLibro> libros = new ArrayList<DatoLibro>();
+            String targetURL = "https://gutendex.com/books/?search=" + titulo.replace(" ", "+");
+            while (targetURL != null) {
+                System.out.printf("DEBUG : Procesando URL %s\n",targetURL);
+                String json = RequerirJSON(targetURL);
+                DatoBiblioteca datoBiblioteca = Conversor.Convertir(json, DatoBiblioteca.class);
+                if (datoBiblioteca.libros().isEmpty()) {
+                    targetURL = null;
+                } else {
+                    libros.addAll(datoBiblioteca.libros().stream().filter(x-> x.titulo().contains(titulo)).toList());
+                    targetURL = datoBiblioteca.siguienteURL();
+                }
+            }
+            if (libros.isEmpty()) {
+                return Optional.empty();
+            } else {
+                return Optional.of(libros);
+            }
+        }
+    }
+
+}
