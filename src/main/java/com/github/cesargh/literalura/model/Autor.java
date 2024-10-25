@@ -20,17 +20,17 @@ public class Autor {
     private String nombre;
 
     @Column(nullable=true)
-    private int anioNacimiento;
+    private Integer anioNacimiento;
 
     @Column(nullable=true)
-    private int anioMuerte;
+    private Integer anioMuerte;
 
     @ManyToMany(mappedBy = "autores", fetch = FetchType.LAZY)
     private List<Libro> libros = new ArrayList<>();
 
     public Autor() {}
 
-    public Autor(String nombre, int anioNacimiento, int anioMuerte) {
+    public Autor(String nombre, Integer anioNacimiento, Integer anioMuerte) {
         this.nombre = nombre;
         this.anioNacimiento = anioNacimiento;
         this.anioMuerte = anioMuerte;
@@ -52,19 +52,19 @@ public class Autor {
         this.nombre = nombre;
     }
 
-    public int getAnioNacimiento() {
+    public Integer getAnioNacimiento() {
         return anioNacimiento;
     }
 
-    public void setAnioNacimiento(int anioNacimiento) {
+    public void setAnioNacimiento(Integer anioNacimiento) {
         this.anioNacimiento = anioNacimiento;
     }
 
-    public int getAnioMuerte() {
+    public Integer getAnioMuerte() {
         return anioMuerte;
     }
 
-    public void setAnioMuerte(int anioMuerte) {
+    public void setAnioMuerte(Integer anioMuerte) {
         this.anioMuerte = anioMuerte;
     }
 
