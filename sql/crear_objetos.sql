@@ -28,7 +28,7 @@ CREATE TABLE public.autores (
     id bigint NOT NULL,
     anio_muerte integer,
     anio_nacimiento integer,
-    nombre character varying(1024) NOT NULL
+    nombre character varying(128) NOT NULL
 );
 
 
