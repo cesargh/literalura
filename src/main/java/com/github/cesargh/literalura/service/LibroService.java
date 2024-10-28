@@ -10,13 +10,14 @@ import com.github.cesargh.literalura.repository.IdiomaRepository;
 import com.github.cesargh.literalura.repository.LibroRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Tuple;
 import org.hibernate.Transaction;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class LibroService {
@@ -33,13 +34,13 @@ public class LibroService {
     @Autowired
     private IdiomaRepository idiomaRepository;
 
-    private void PersistirLibros(List<DatoLibro> librosBuscados) {
-        System.out.println("DEBUG : LibroService.PersistirLibros --> INICIO");
+    private void Persistir(List<DatoLibro> librosBuscados) {
+        System.out.println("DEBUG : LibroService.Persistir --> INICIO");
         SessionImplementor sessionImp = (SessionImplementor) entityManager.getDelegate();
         Transaction transaction = sessionImp.getTransaction();
         try {
             transaction.begin();
-            System.out.println("DEBUG : LibroService.PersistirLibros --> TRANSACTION BEGIN");
+            System.out.println("DEBUG : LibroService.Persistir --> TRANSACTION BEGIN");
             for(String codigo : librosBuscados.stream().flatMap(e -> e.idiomas().stream()).distinct().toList()) {
                 if (! idiomaRepository.existsByCodigo(codigo)) {
                     System.out.printf("DEBUG : Guardando idioma con Código = %s\n", codigo);
@@ -72,24 +73,57 @@ public class LibroService {
                 }
             }
             transaction.commit();
-            System.out.println("DEBUG : LibroService.PersistirLibros --> TRANSACTION COMMIT");
+            System.out.println("DEBUG : LibroService.Persistir --> TRANSACTION COMMIT");
         } catch (Exception e) {
             transaction.rollback();
-            System.out.println("DEBUG : LibroService.PersistirLibros --> TRANSACTION ROLLBACK");
+            System.out.println("DEBUG : LibroService.Persistir --> TRANSACTION ROLLBACK");
             throw new LibroServiceException(e);
         } finally {
-            System.out.println("DEBUG : LibroService.PersistirLibros --> FIN");
+            System.out.println("DEBUG : LibroService.Persistir --> FIN");
         }
     }
 
-    public Optional<List<Libro>> BuscarLibrosPorTitulo(String titulo) {
-        Optional<List<DatoLibro>> librosBuscados = Buscador.BuscarLibrosPorTitulo(titulo);
+    public List<Libro> BuscarPorTitulo(String titulo) {
+        List<DatoLibro> librosBuscados = Buscador.BuscarLibrosPorTitulo(titulo);
         if (librosBuscados.isEmpty()) {
-            return Optional.empty();
+            return new ArrayList<>();
         } else {
-            PersistirLibros(librosBuscados.get());
-            return libroRepository.findByIdIn(librosBuscados.get().stream().map(DatoLibro::id).toList());
+            Persistir(librosBuscados);
+            return libroRepository.findByIdInOrderByTitulo(librosBuscados.stream().map(DatoLibro::id).toList());
         }
+    }
+
+    public List<Tuple> ObtenerCantidadesPorIdiomaConSQLNativo() {
+        return libroRepository.obtenerCantidadesPorIdioma();
+    }
+
+    public List<Map.Entry<String,Long>> ObtenerCantidadesPorIdiomaConStreams() {
+        var resultado = ObtenerTodos();
+        if (resultado.isEmpty()) {
+            return new ArrayList<>();
+        } else {
+            return resultado.stream()
+                .flatMap(libro -> libro.getIdiomas().stream().map(Idioma::getCodigo))
+                .collect(Collectors.groupingBy(idioma -> idioma, Collectors.counting()))
+                .entrySet().stream()
+                .sorted((entry1, entry2) -> {
+                    int valueComparison = entry2.getValue().compareTo(entry1.getValue());
+                    if (valueComparison != 0) {
+                        return valueComparison;
+                    } else {
+                        return entry1.getKey().compareTo(entry2.getKey());
+                    }
+                })
+                .toList();
+        }
+    }
+
+    public List<Libro> ObtenerPorTitulo(String titulo) {
+        return libroRepository.findByTituloContainingIgnoreCaseOrderByTitulo(titulo);
+    }
+
+    public List<Libro> ObtenerTodos() {
+        return libroRepository.findAll();
     }
 
 }

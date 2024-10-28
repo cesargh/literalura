@@ -17,15 +17,14 @@ public final class Buscador {
     private Buscador() {
     }
 
-    private static String RequerirJSON(String targetURL)
-            throws IOException, InterruptedException {
+    private static String RequerirJSON(String targetURL) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(targetURL)).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         return response.body();
     }
 
-    public static Optional<List<DatoLibro>> BuscarLibrosPorTitulo(String titulo) throws BuscadorException {
+    public static List<DatoLibro> BuscarLibrosPorTitulo(String titulo) throws BuscadorException {
         if ((titulo == null) || titulo.isBlank()) {
             throw new BuscadorException(new IllegalArgumentException("Omisión de parámetro"));
         } else {
@@ -39,17 +38,14 @@ public final class Buscador {
                     if (datoBiblioteca.libros().isEmpty()) {
                         targetURL = null;
                     } else {
-                        libros.addAll(datoBiblioteca.libros().stream()
-                                .filter(x -> x.titulo().toLowerCase().contains(titulo.toLowerCase()))
-                                .toList());
+                        libros.addAll(
+                            datoBiblioteca.libros().stream()
+                            .filter(x -> x.titulo().toLowerCase().contains(titulo.toLowerCase()))
+                            .toList());
                         targetURL = datoBiblioteca.siguienteURL();
                     }
                 }
-                if (libros.isEmpty()) {
-                    return Optional.empty();
-                } else {
-                    return Optional.of(libros);
-                }
+                return libros;
             } catch (Throwable e) {
                 throw new BuscadorException(e);
             }

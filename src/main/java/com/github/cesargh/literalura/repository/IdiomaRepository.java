@@ -9,8 +9,13 @@ import java.util.Optional;
 @Repository
 public interface IdiomaRepository extends JpaRepository<Idioma,Long> {
 
-    // JPA Consultas Derivadas
+    //region [Category: JPA Derived Queries]
+
+    // Consultas generadas automáticamente a partir del nombre del método.
+
     boolean existsByCodigo(String codigo);
     Optional<Idioma> findByCodigo(String codigo);
+
+    //endregion [Category: JPA Derived Queries]
 
 }
