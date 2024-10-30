@@ -27,6 +27,7 @@ public class Libro {
             name = "libros_autores",
             joinColumns = @JoinColumn(name = "libro_id", foreignKey = @ForeignKey(name = "fk_libros_autores_libro_id")),
             inverseJoinColumns = @JoinColumn(name = "autor_id", foreignKey = @ForeignKey(name = "fk_libros_autores_autor_id")))
+    @OrderBy("nombre ASC")
     private List<Autor> autores = new ArrayList<>();
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
@@ -34,6 +35,7 @@ public class Libro {
             name = "libros_idiomas",
             joinColumns = @JoinColumn(name = "libro_id", foreignKey = @ForeignKey(name = "fk_libros_idiomas_libro_id")),
             inverseJoinColumns = @JoinColumn(name = "idioma_id", foreignKey = @ForeignKey(name = "fk_libros_idiomas_idioma_id")))
+    @OrderBy("codigo ASC")
     private List<Idioma> idiomas = new ArrayList<>();
 
     public Libro() {}

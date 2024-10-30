@@ -20,6 +20,7 @@ public class Idioma {
     private String codigo;
 
     @ManyToMany(mappedBy = "idiomas", fetch = FetchType.LAZY)
+    @OrderBy("titulo ASC")
     private List<Libro> libros = new ArrayList<>();
 
     public Idioma() {}

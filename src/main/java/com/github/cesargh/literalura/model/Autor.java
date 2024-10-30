@@ -26,6 +26,7 @@ public class Autor {
     private Integer anioMuerte;
 
     @ManyToMany(mappedBy = "autores", fetch = FetchType.LAZY)
+    @OrderBy("titulo ASC")
     private List<Libro> libros = new ArrayList<>();
 
     public Autor() {}
