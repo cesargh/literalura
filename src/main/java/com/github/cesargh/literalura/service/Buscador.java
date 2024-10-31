@@ -32,7 +32,6 @@ public final class Buscador {
                 List<DatoLibro> libros = new ArrayList<>();
                 String targetURL = "https://gutendex.com/books/?search=" + URLEncoder.encode(titulo, StandardCharsets.UTF_8);
                 while (targetURL != null) {
-                    System.out.printf("DEBUG : Procesando URL %s\n", targetURL);
                     String json = RequerirJSON(targetURL);
                     DatoBiblioteca datoBiblioteca = Conversor.Convertir(json, DatoBiblioteca.class);
                     if (datoBiblioteca.libros().isEmpty()) {

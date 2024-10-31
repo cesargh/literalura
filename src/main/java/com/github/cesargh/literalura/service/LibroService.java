@@ -35,21 +35,17 @@ public class LibroService {
     private IdiomaRepository idiomaRepository;
 
     private void Persistir(List<DatoLibro> librosBuscados) {
-        System.out.println("DEBUG : LibroService.Persistir --> INICIO");
         SessionImplementor sessionImp = (SessionImplementor) entityManager.getDelegate();
         Transaction transaction = sessionImp.getTransaction();
         try {
             transaction.begin();
-            System.out.println("DEBUG : LibroService.Persistir --> TRANSACTION BEGIN");
             for(String codigo : librosBuscados.stream().flatMap(e -> e.idiomas().stream()).distinct().toList()) {
                 if (! idiomaRepository.existsByCodigo(codigo)) {
-                    System.out.printf("DEBUG : Guardando idioma con Código = %s\n", codigo);
                     idiomaRepository.save(new Idioma(codigo));
                  }
             }
             for(String nombre : librosBuscados.stream().flatMap(e -> e.autores().stream()).map(DatoAutor::nombre).distinct().toList()) {
                 if (! autorRepository.existsByNombre(nombre)) {
-                    System.out.printf("DEBUG : Guardando autor con Nombre = %s\n", nombre);
                     var optDatoAutor = librosBuscados.stream().flatMap(e -> e.autores().stream()).filter(e -> e.nombre().equals(nombre)).findFirst();
                     if(optDatoAutor.isPresent()) {
                         DatoAutor datoAutor = optDatoAutor.get();
@@ -59,7 +55,6 @@ public class LibroService {
             }
             for(DatoLibro datoLibro : librosBuscados) {
                 if (! libroRepository.existsById(datoLibro.id())) {
-                    System.out.printf("DEBUG : Guardando libro con Id = %s\n", datoLibro.id());
                     Libro libro = new Libro(datoLibro.id(), datoLibro.titulo(), datoLibro.descargas());
                     for(String codigo : datoLibro.idiomas()) {
                         var optIdioma = idiomaRepository.findByCodigo(codigo);
@@ -73,13 +68,9 @@ public class LibroService {
                 }
             }
             transaction.commit();
-            System.out.println("DEBUG : LibroService.Persistir --> TRANSACTION COMMIT");
         } catch (Exception e) {
             transaction.rollback();
-            System.out.println("DEBUG : LibroService.Persistir --> TRANSACTION ROLLBACK");
             throw new LibroServiceException(e);
-        } finally {
-            System.out.println("DEBUG : LibroService.Persistir --> FIN");
         }
     }
 
