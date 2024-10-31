@@ -172,6 +172,9 @@ final class Impresor {
                     for (LibroDTO libro : autor.libros()) {
                         listaLibros.append("                    ");
                         listaLibros.append(libro.titulo());
+                        listaLibros.append(" (Gutendex Id : ");
+                        listaLibros.append(libro.id());
+                        listaLibros.append(")");
                         listaLibros.append("\n");
                     }
                     ImprimirInforme(etiquetaLibro, listaLibros.toString().trim());
