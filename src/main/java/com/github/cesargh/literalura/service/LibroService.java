@@ -118,12 +118,20 @@ public class LibroService {
         }
     }
 
+    public List<Libro> ObtenerPorIdioma(String codigoIdioma) {
+        return libroRepository.obtenerPorIdioma(codigoIdioma);
+    }
+
     public List<Libro> ObtenerPorTitulo(String titulo) {
         return libroRepository.findByTituloContainingIgnoreCaseOrderByTitulo(titulo);
     }
 
     public List<Libro> ObtenerTodos() {
         return libroRepository.findAll();
+    }
+
+    public List<Libro> ObtenerTop10Descargas() {
+        return libroRepository.findTop10ByOrderByDescargasDesc();
     }
 
 }

@@ -1,6 +1,7 @@
 package com.github.cesargh.literalura.controller;
 
 import com.github.cesargh.literalura.dto.AutorDTO;
+import com.github.cesargh.literalura.dto.EstadisticaDTO;
 import com.github.cesargh.literalura.dto.IdiomaDTO;
 import com.github.cesargh.literalura.dto.LibroDTO;
 import com.github.cesargh.literalura.model.Autor;
@@ -50,12 +51,28 @@ public class AutorController {
         }
     }
 
+    public List<EstadisticaDTO> InformarCantidadesPorIdioma() {
+        return autorService.ObtenerCantidadesPorIdioma()
+            .stream()
+            .map(e -> new EstadisticaDTO
+                (
+                e.get("valor", Long.class),
+                e.get("descripcion", String.class)
+                )
+            )
+            .toList();
+    }
+
     public List<AutorDTO> InformarPorNombre(String nombre) {
         return TransformarAutorDTO(autorService.ObtenerPorNombre(nombre));
     }
 
+    public List<AutorDTO> InformarTop10Jovenes() {
+        return TransformarAutorDTO(autorService.ObtenerTop10Jovenes());
+    }
+
     public List<AutorDTO> InformarVivosPorAnio(int anio) {
-        return TransformarAutorDTO(autorService.InformarVivosPorAnio(anio));
+        return TransformarAutorDTO(autorService.ObtenerVivosPorAnio(anio));
     }
 
 }

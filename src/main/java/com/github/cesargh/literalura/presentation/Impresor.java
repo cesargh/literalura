@@ -238,7 +238,7 @@ final class Impresor {
     }
 
     public void ImprimirMenu(int opcion, String descripcion) {
-        System.out.print(colorMenu.tag + opcion + colorDefault.tag + descripcion + ColorTag.RESET.tag + "\n");
+        System.out.print(colorMenu.tag + String.format("%2d", opcion) + colorDefault.tag + descripcion + ColorTag.RESET.tag + "\n");
     }
 
     public void ImprimirMenu(String titulo) {

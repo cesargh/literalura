@@ -82,8 +82,16 @@ public class LibroController {
 
     }
 
+    public List<LibroDTO> InformarPorIdioma(String codigoIdioma) {
+        return TransformarLibroDTO(libroService.ObtenerPorIdioma(codigoIdioma));
+    }
+
     public List<LibroDTO> InformarPorTitulo(String titulo) {
         return TransformarLibroDTO(libroService.ObtenerPorTitulo(titulo));
+    }
+
+    public List<LibroDTO> ObtenerTop10Descargas() {
+        return TransformarLibroDTO(libroService.ObtenerTop10Descargas());
     }
 
 }

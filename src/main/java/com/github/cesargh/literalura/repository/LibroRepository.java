@@ -4,6 +4,7 @@ import com.github.cesargh.literalura.model.Libro;
 import jakarta.persistence.Tuple;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public interface LibroRepository extends JpaRepository<Libro,Long> {
 
     List<Libro> findByIdInOrderByTitulo(List<Long> ids);
     List<Libro> findByTituloContainingIgnoreCaseOrderByTitulo(String titulo);
+    List<Libro> findTop10ByOrderByDescargasDesc();
 
     //endregion [Category: JPA Derived Queries]
 
@@ -33,6 +35,17 @@ public interface LibroRepository extends JpaRepository<Libro,Long> {
                     ORDER BY valor DESC, descripcion ASC
                     """)
     List<Tuple> obtenerCantidadesPorIdioma();
+
+    @Query( nativeQuery = true,
+            value = """
+                    SELECT a.*
+                    FROM libros a
+                    INNER JOIN libros_idiomas b on b.libro_id = a.id
+                    INNER JOIN idiomas c on c.id = b.idioma_id
+                    WHERE c.codigo = :codigoIdioma
+                    ORDER BY a.titulo
+                    """)
+    List<Libro> obtenerPorIdioma(@Param("codigoIdioma") String codigoIdioma);
 
     //endregion [Category: SQL Native Queries]
 
